@@ -1,0 +1,391 @@
+
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  #gc{position:relative;width:100%;max-width:420px;margin:0 auto;height:660px;background:linear-gradient(180deg,#0d1b2a 0%,#1a2e1a 60%,#0d2219 100%);border-radius:16px;overflow:hidden;font-family:monospace;border:2px solid #2a4a3a;user-select:none;}
+  #road{position:absolute;bottom:0;left:0;width:100%;height:72px;background:#1a1a2e;border-top:3px solid #ff6b35;}
+  .rm{position:absolute;bottom:28px;height:7px;width:36px;background:#ffd700;border-radius:3px;}
+
+  #hud-top{position:absolute;top:8px;left:0;width:100%;padding:0 10px;z-index:20;display:flex;flex-direction:column;gap:4px;}
+
+  #row-level{display:flex;align-items:center;gap:6px;width:100%;}
+  #lvl-badge{background:#ffd700;color:#1a1000;font-size:10px;font-weight:800;border-radius:5px;padding:2px 7px;white-space:nowrap;}
+  #xp-track{flex:1;height:11px;background:#ffffff22;border-radius:5px;overflow:hidden;border:1px solid #ffd70055;}
+  #xp-fill{height:100%;border-radius:5px;background:#ffd700;transition:width 0.25s;}
+  #xplabel{font-size:9px;color:#ffd700aa;min-width:38px;text-align:right;}
+
+  #row-bars{display:flex;align-items:flex-start;gap:8px;width:100%;}
+  .bar-block{display:flex;flex-direction:column;gap:2px;flex:1;}
+  .bar-header{display:flex;align-items:center;justify-content:space-between;}
+  .bar-icon{font-size:11px;}
+  .bar-pct{font-size:9px;color:#ffffff88;}
+  .bar-track{width:100%;height:12px;background:#ffffff22;border-radius:6px;overflow:hidden;border:1px solid #ffffff33;}
+  .bar-fill{height:100%;border-radius:6px;transition:width 0.2s;}
+
+  #row-score{display:flex;justify-content:space-between;align-items:center;}
+  #scorebox{font-size:14px;font-weight:800;color:#ffd700;}
+  #livebox{display:flex;gap:2px;}
+
+  #player{position:absolute;width:60px;height:76px;z-index:10;}
+  .item{position:absolute;width:46px;height:46px;z-index:8;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;border-radius:50%;flex-direction:column;line-height:1.1;text-align:center;}
+  #statusmsg{position:absolute;top:46%;left:50%;transform:translate(-50%,-50%);font-size:19px;font-weight:800;color:#fff;text-align:center;z-index:25;pointer-events:none;opacity:0;transition:opacity 0.3s;line-height:1.5;}
+  .xp-pop{position:absolute;font-size:13px;font-weight:800;z-index:26;pointer-events:none;animation:xprise 0.9s ease-out forwards;}
+  @keyframes xprise{0%{opacity:1;transform:translateY(0);}100%{opacity:0;transform:translateY(-52px);}}
+  #overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#000000cc;z-index:30;border-radius:14px;}
+  #overlay h1{font-size:28px;font-weight:800;color:#ffd700;margin-bottom:4px;}
+  #overlay p{color:#fff;font-size:11px;margin:2px 0 14px;text-align:center;max-width:320px;font-weight:700;line-height:1.75;}
+  #startbtn{background:#e74c3c;color:#fff;border:none;border-radius:10px;padding:11px 30px;font-size:17px;font-weight:800;cursor:pointer;}
+  #startbtn:hover{background:#c0392b;}
+  #finalscore{font-size:18px;color:#ffd700;font-weight:800;margin:6px 0;text-align:center;}
+  #legend{position:absolute;bottom:80px;right:6px;z-index:20;display:flex;flex-direction:column;gap:2px;}
+  .leg{font-size:9px;color:#ffffffaa;display:flex;align-items:center;gap:3px;}
+  #effects{position:absolute;inset:0;pointer-events:none;z-index:22;border-radius:14px;opacity:0;transition:opacity 0.35s;}
+  #lvlup-banner{position:absolute;top:36%;left:50%;transform:translate(-50%,-50%);z-index:27;pointer-events:none;opacity:0;transition:opacity 0.2s;text-align:center;}
+  #chol-danger{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:21;border-radius:14px;border:0px solid #ff4444;transition:border-width 0.3s,opacity 0.3s;opacity:0;}
+</style>
+
+<div id="gc">
+  <div id="effects"></div>
+  <div id="chol-danger"></div>
+  <div id="road">
+    <div class="rm" style="left:20px"></div><div class="rm" style="left:100px"></div>
+    <div class="rm" style="left:190px"></div><div class="rm" style="left:280px"></div>
+    <div class="rm" style="left:370px"></div>
+  </div>
+
+  <div id="hud-top">
+    <div id="row-level">
+      <div id="lvl-badge">LVL 1</div>
+      <div id="xp-track"><div id="xp-fill" style="width:0%"></div></div>
+      <div id="xplabel">0/100</div>
+    </div>
+    <div id="row-bars">
+      <div class="bar-block">
+        <div class="bar-header">
+          <span class="bar-icon">🫀 Kolesterol</span>
+          <span class="bar-pct" id="chollabel">0%</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" id="cholbar-fill" style="width:0%;background:#f1c40f;"></div></div>
+      </div>
+      <div class="bar-block">
+        <div class="bar-header">
+          <span class="bar-icon">😮 Boğulma</span>
+          <span class="bar-pct" id="clabel">0%</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" id="cbar-fill" style="width:0%;background:#3498db;"></div></div>
+      </div>
+    </div>
+    <div id="row-score">
+      <div id="scorebox">⭐ 0 XP</div>
+      <div id="livebox"></div>
+    </div>
+  </div>
+
+  <div id="statusmsg"></div>
+  <div id="lvlup-banner"></div>
+  <div id="player"></div>
+  <div id="legend">
+    <div class="leg"><span style="font-size:12px;">🐔</span> Tavuk +15XP</div>
+    <div class="leg"><span style="font-size:12px;">🐄</span> Dana +25XP</div>
+    <div class="leg"><span style="font-size:12px;">⭐</span> Özel +40XP</div>
+    <div class="leg"><span style="font-size:12px;">🥗</span> Sebze -🫀</div>
+    <div class="leg"><span style="font-size:12px;">🥛</span> Ayran -😮</div>
+    <div class="leg"><span style="font-size:12px;">🧉</span> Şalgam -😮⚡</div>
+  </div>
+  <div id="overlay">
+    <div style="font-size:48px;margin-bottom:4px;">🌯</div>
+    <h1>Dürüm Drop v4</h1>
+    <p>
+      ← → veya sürükle / drag to move<br>
+      <span style="color:#ffcc44;">🐔 Tavuk +15XP &nbsp; 🐄 Dana +25XP &nbsp; ⭐ Özel +40XP</span><br>
+      🫀 <b>Kolesterol:</b> dürümde artar, sebzeyle düşür → %100 = 😴 koma<br>
+      😮 <b>Boğulma:</b> dürümde artar, ayran🥛/şalgam🧉 ile düşür → %100 = 😵<br>
+      🥗 4+ sebze üst üste → 🤮 stun
+    </p>
+    <button id="startbtn">OYNA / PLAY</button>
+    <div id="finalscore" style="display:none"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const gc=document.getElementById('gc');
+  const ov=document.getElementById('overlay');
+  const scoreEl=document.getElementById('scorebox');
+  const livebox=document.getElementById('livebox');
+  const cholfill=document.getElementById('cholbar-fill');
+  const cfill=document.getElementById('cbar-fill');
+  const xpfill=document.getElementById('xp-fill');
+  const chollabel=document.getElementById('chollabel');
+  const clabel=document.getElementById('clabel');
+  const xplabel=document.getElementById('xplabel');
+  const lvlBadge=document.getElementById('lvl-badge');
+  const lvlBanner=document.getElementById('lvlup-banner');
+  const playerEl=document.getElementById('player');
+  const statusEl=document.getElementById('statusmsg');
+  const fxEl=document.getElementById('effects');
+  const cholDanger=document.getElementById('chol-danger');
+  const finalEl=document.getElementById('finalscore');
+  const startBtn=document.getElementById('startbtn');
+
+  const W=420,PW=60,PH=76,ROAD=72,H=660;
+  const PY=H-ROAD-PH-4;
+
+  const DURUM_TYPES=[
+    {label:'Tavuk',color:'#f39c12',xp:15,chol:12,choke:14},
+    {label:'Dana', color:'#e74c3c',xp:25,chol:20,choke:20},
+    {label:'Özel', color:'#9b59b6',xp:40,chol:30,choke:28},
+  ];
+  const DURUM_WEIGHTS=[0.50,0.35,0.15];
+  const VEGS=['🥗','🥦','🥕','🥒','🍅'];
+  const DRINKS=[
+    {emoji:'🥛',label:'Ayran', chokeReduce:28},
+    {emoji:'🧉',label:'Şalgam',chokeReduce:42},
+  ];
+  const XP_LEVELS=[0,100,220,380,580,830,1130,1480,1880,2340,2860];
+
+  let chol,choke,totalXp,level,xpInLevel,lives,falling,px,speed,spawnT,spawnRate,vegStreak,durumsWithoutDrink,gameOn,aid,keys,stunTimer,stunType,statusTimeout,drag,lastTX;
+
+  function xpToReach(l){return(XP_LEVELS[Math.min(l,XP_LEVELS.length-2)+1]||2860)-XP_LEVELS[Math.min(l,XP_LEVELS.length-2)];}
+
+  function setLives(l){
+    livebox.innerHTML='';
+    for(let i=0;i<3;i++) livebox.innerHTML+=`<span style="font-size:16px;opacity:${i<l?1:0.18}">❤️</span>`;
+  }
+
+  function updateBars(){
+    const ch=Math.max(0,Math.min(100,chol));
+    const ck=Math.max(0,Math.min(100,choke));
+    cholfill.style.width=ch+'%';
+    cholfill.style.background=ch<40?'#f1c40f':ch<70?'#e67e22':ch<88?'#e74c3c':'#c0392b';
+    cfill.style.width=ck+'%';
+    cfill.style.background=ck>75?'#e74c3c':ck>45?'#f39c12':'#3498db';
+    chollabel.textContent=Math.round(ch)+'%';
+    clabel.textContent=Math.round(ck)+'%';
+    const need=xpToReach(level);
+    xpfill.style.width=Math.min(100,Math.round(xpInLevel/need*100))+'%';
+    xplabel.textContent=xpInLevel+'/'+need;
+    lvlBadge.textContent='LVL '+level;
+    scoreEl.textContent='⭐ '+totalXp+' XP';
+    const danger=ch>=70;
+    cholDanger.style.opacity=danger?'1':'0';
+    cholDanger.style.borderWidth=danger?'4px':'0px';
+    cholDanger.style.borderColor=ch>=88?'#c0392b':'#e67e22';
+  }
+
+  function addXp(amount,x,y){
+    totalXp+=amount;xpInLevel+=amount;
+    const need=xpToReach(level);
+    while(xpInLevel>=need&&level<10){xpInLevel-=need;level++;showLevelUp();speed+=0.18;spawnRate=Math.max(36,spawnRate-5);}
+    spawnPop('+'+amount+'XP',x,y-8,amount>=40?'#9b59b6':amount>=25?'#e74c3c':'#f39c12');
+    updateBars();
+  }
+
+  function showLevelUp(){
+    const stars=['','⭐','⭐⭐','⭐⭐⭐','🌟','🌟🌟','🌟🌟🌟','👑','👑⭐','👑🌟','🏆'];
+    lvlBanner.innerHTML=`<div style="font-size:26px;font-weight:800;color:#ffd700;">SEVİYE ${level}!</div><div style="font-size:18px;">${stars[Math.min(level,10)]}</div>`;
+    lvlBanner.style.opacity=1;
+    setTimeout(()=>lvlBanner.style.opacity=0,1800);
+    flashScreen('#ffd700');
+  }
+
+  function spawnPop(txt,x,y,color){
+    const el=document.createElement('div');
+    el.className='xp-pop';el.textContent=txt;
+    el.style.left=(x+6)+'px';el.style.top=y+'px';el.style.color=color;
+    gc.appendChild(el);
+    setTimeout(()=>{try{gc.removeChild(el);}catch(e){}},900);
+  }
+
+  function drawPlayer(){
+    playerEl.style.left=px+'px';playerEl.style.top=PY+'px';
+    const face=stunType==='vomit'?'🤮':stunType==='choke'?'😵':stunType==='coma'?'😴':'😐';
+    const bc=stunType?'#888':'#e74c3c';
+    const ac=stunType?'#666':'#c0392b';
+    playerEl.innerHTML=`<svg viewBox="0 0 60 76" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="30" cy="14" r="12" fill="#FFDAA5" stroke="#c98a4a" stroke-width="1.5"/>
+      <text x="30" y="19" text-anchor="middle" font-size="14">${face}</text>
+      <rect x="12" y="24" width="36" height="26" rx="8" fill="${bc}"/>
+      <rect x="14" y="28" width="6" height="18" rx="3" fill="${ac}"/>
+      <rect x="40" y="28" width="6" height="18" rx="3" fill="${ac}"/>
+      <rect x="16" y="50" width="10" height="20" rx="5" fill="#3a6ecc"/>
+      <rect x="34" y="50" width="10" height="20" rx="5" fill="#3a6ecc"/>
+    </svg>`;
+  }
+
+  function showStatus(txt,color,dur){
+    clearTimeout(statusTimeout);
+    statusEl.textContent=txt;statusEl.style.color=color;statusEl.style.opacity=1;
+    statusTimeout=setTimeout(()=>statusEl.style.opacity=0,dur||1000);
+  }
+
+  function flashScreen(color){
+    fxEl.style.background=color;fxEl.style.opacity='0.38';
+    setTimeout(()=>fxEl.style.opacity='0',380);
+  }
+
+  function loseLife(msg){
+    lives=Math.max(0,lives-1);setLives(lives);
+    showStatus(msg,'#ff4444',2000);flashScreen('#ff0000');
+    if(lives<=0){endGame();return false;}
+    return true;
+  }
+
+  function triggerStun(type,msg,duration){
+    if(stunTimer>0) return;
+    stunType=type;stunTimer=duration||190;
+    if(!loseLife(msg)) return;
+    if(type==='choke') choke=15;
+    if(type==='vomit') vegStreak=0;
+    if(type==='coma') chol=20;
+    updateBars();
+  }
+
+  function pickDurum(){
+    const r=Math.random();let acc=0;
+    for(let i=0;i<DURUM_TYPES.length;i++){acc+=DURUM_WEIGHTS[i];if(r<acc)return DURUM_TYPES[i];}
+    return DURUM_TYPES[0];
+  }
+
+  function spawnItem(){
+    const r=Math.random();
+    const el=document.createElement('div');el.className='item';
+    let type;
+    if(r<0.50){
+      type='durum';const d=pickDurum();
+      el.style.background=d.color+'33';el.style.border='2px solid '+d.color;
+      el.innerHTML=`<span style="font-size:20px;">${d.label==='Özel'?'🫔':'🌯'}</span><span style="font-size:8px;color:${d.color};font-weight:800;">${d.label}</span>`;
+      el.dataset.xp=d.xp;el.dataset.chol=d.chol;el.dataset.choke=d.choke;
+    } else if(r<0.73){
+      type='veg';const v=VEGS[Math.floor(Math.random()*VEGS.length)];
+      el.innerHTML=`<span style="font-size:24px;">${v}</span>`;
+      el.style.background='#2ecc7133';el.style.border='2px solid #2ecc71';
+    } else {
+      type='drink';const dk=DRINKS[Math.floor(Math.random()*DRINKS.length)];
+      el.innerHTML=`<span style="font-size:20px;">${dk.emoji}</span><span style="font-size:8px;color:#74b9ff;font-weight:800;">${dk.label}</span>`;
+      el.dataset.chokeReduce=dk.chokeReduce;
+      el.style.background='#3498db33';el.style.border='2px solid #3498db';
+    }
+    el.dataset.type=type;
+    const x=Math.random()*(W-60)+10;
+    el.style.left=x+'px';el.style.top='-50px';
+    el.dataset.x=x;el.dataset.y=-50;el.dataset.vx=(Math.random()-0.5)*0.9;
+    gc.appendChild(el);falling.push(el);
+  }
+
+  function catchItem(el){
+    const type=el.dataset.type;
+    const ix=parseFloat(el.dataset.x),iy=parseFloat(el.dataset.y);
+    if(type==='durum'){
+      const xpGain=parseInt(el.dataset.xp);
+      const cholGain=parseInt(el.dataset.chol);
+      const chokeGain=parseInt(el.dataset.choke);
+      chol=Math.min(100,chol+cholGain);
+      choke=Math.min(100,choke+chokeGain);
+      vegStreak=0;durumsWithoutDrink++;
+      flashScreen('#ff6b35');
+      spawnPop('+'+ cholGain+'🫀',ix,iy-22,'#e74c3c');
+      addXp(xpGain,ix,iy);
+      if(chol>=100){triggerStun('coma','😴 YEMEK KOMASI!',240);return;}
+      if(choke>=100){triggerStun('choke','😵 BOĞULUYORUM!',200);return;}
+      if(durumsWithoutDrink>=5) showStatus('🥛 Bir şeyler iç!','#f39c12',1000);
+      if(chol>=70) showStatus('🫀 Kolesterol yükseliyor!','#e67e22',900);
+      updateBars();
+    } else if(type==='veg'){
+      const reduce=18;
+      chol=Math.max(0,chol-reduce);
+      vegStreak++;durumsWithoutDrink=0;
+      spawnPop('-'+reduce+'🫀',ix,iy-22,'#2ecc71');
+      flashScreen('#2ecc71');updateBars();
+      if(vegStreak>=4){triggerStun('vomit','🤮 Çok fazla sebze!',200);return;}
+      showStatus(['🥗 Kolesterol düştü!','🥦 Sağlıklı!','🥕 Aferin!'][Math.floor(Math.random()*3)],'#2ecc71',700);
+    } else if(type==='drink'){
+      const reduce=parseInt(el.dataset.chokeReduce)||28;
+      choke=Math.max(0,choke-reduce);
+      durumsWithoutDrink=0;vegStreak=0;
+      flashScreen('#3498db');updateBars();
+      showStatus(reduce>30?'🧉 Şalgam gücü!':'🥛 Ahh, ayran!','#74b9ff',800);
+    }
+  }
+
+  function initGame(){
+    chol=0;choke=0;totalXp=0;level=1;xpInLevel=0;lives=3;
+    speed=2.2;spawnRate=82;spawnT=0;vegStreak=0;durumsWithoutDrink=0;
+    stunTimer=0;stunType=null;gameOn=true;
+    setLives(3);updateBars();
+    falling.forEach(f=>{try{gc.removeChild(f);}catch(e){}});
+    falling=[];px=(W-PW)/2;
+    drawPlayer();
+    statusEl.style.opacity=0;lvlBanner.style.opacity=0;
+    cholDanger.style.opacity=0;cholDanger.style.borderWidth='0px';
+    ov.style.display='none';
+  }
+
+  function endGame(){
+    gameOn=false;cancelAnimationFrame(aid);
+    falling.forEach(f=>{try{gc.removeChild(f);}catch(e){}});
+    falling=[];
+    ov.style.display='flex';
+    startBtn.textContent='Tekrar / Retry';
+    finalEl.style.display='block';
+    finalEl.innerHTML='⭐ '+totalXp+' XP &nbsp;|&nbsp; LVL '+level+'<br><span style="font-size:13px;color:#ffffff88;">Kolesterol: '+Math.round(chol)+'%</span>';
+    const p=ov.querySelector('p');
+    if(level>=8) p.innerHTML='Efsane Dürümcü! 🏆 LVL '+level;
+    else if(level>=5) p.innerHTML='Harika! Dengeyi tutturdun! 🌯 LVL '+level;
+    else if(level>=3) p.innerHTML='Fena değil! Devam et! 💪 LVL '+level;
+    else p.innerHTML='Dürüm seni yedi! 😵 Tekrar dene!';
+  }
+
+  function loop(){
+    if(!gameOn) return;
+    if(stunTimer>0){
+      stunTimer--;drawPlayer();
+      if(stunTimer===0){stunType=null;drawPlayer();}
+    } else {
+      if(keys['ArrowLeft']||keys['a']) px=Math.max(0,px-5.5);
+      if(keys['ArrowRight']||keys['d']) px=Math.min(W-PW,px+5.5);
+      drawPlayer();
+    }
+    spawnT++;
+    if(spawnT>=spawnRate){spawnItem();spawnT=0;}
+    for(let i=falling.length-1;i>=0;i--){
+      const el=falling[i];
+      let y=parseFloat(el.dataset.y)+speed;
+      let x=parseFloat(el.dataset.x)+parseFloat(el.dataset.vx);
+      if(x<5) el.dataset.vx=Math.abs(parseFloat(el.dataset.vx));
+      if(x>W-50) el.dataset.vx=-Math.abs(parseFloat(el.dataset.vx));
+      el.dataset.y=y;el.dataset.x=x;
+      el.style.top=y+'px';el.style.left=x+'px';
+      const hit=(y+44>PY)&&(y<PY+PH)&&(x+38>px+6)&&(x+8<px+PW-6);
+      if(hit){
+        try{gc.removeChild(el);}catch(e){}
+        falling.splice(i,1);
+        if(!stunTimer){catchItem(el);}
+        if(!gameOn) return;
+      } else if(y>H+10){
+        try{gc.removeChild(el);}catch(e){}
+        falling.splice(i,1);
+      }
+    }
+    aid=requestAnimationFrame(loop);
+  }
+
+  falling=[];keys={};drag=false;lastTX=0;
+  drawPlayer();
+  document.addEventListener('keydown',e=>{keys[e.key]=true;});
+  document.addEventListener('keyup',e=>{keys[e.key]=false;});
+  gc.addEventListener('touchstart',e=>{drag=true;lastTX=e.touches[0].clientX;e.preventDefault();},{passive:false});
+  gc.addEventListener('touchmove',e=>{
+    if(!drag)return;
+    const dx=e.touches[0].clientX-lastTX;lastTX=e.touches[0].clientX;
+    if(!stunTimer) px=Math.max(0,Math.min(W-PW,px+dx*1.4));
+    e.preventDefault();
+  },{passive:false});
+  gc.addEventListener('touchend',()=>drag=false);
+  gc.addEventListener('mousemove',e=>{
+    if(!gameOn||stunTimer)return;
+    const rect=gc.getBoundingClientRect();
+    px=Math.max(0,Math.min(W-PW,(e.clientX-rect.left)-PW/2));
+  });
+  startBtn.addEventListener('click',()=>{if(aid)cancelAnimationFrame(aid);initGame();loop();});
+})();
+</script>
