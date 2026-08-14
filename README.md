@@ -4,4 +4,4 @@
 
 [![DÖNER DÜRÜM](https://img.shields.io/badge/DÖNER_DÜRÜM-🥙_HEMEN_OYNA-D9381E?style=flat-square&logo=gamepad&logoColor=white)](https://utkuakinci.github.io/Game_Doner_Durum/)
 
-[![DÖNER DÜRÜM](https://img.shields.io/badge/DÖNER_DÜRÜM-🥙_HEMEN_OYNA-C62828?style=for-the-badge&logo=gamepad&logoColor=white&colorA=C62828&colorB=C62828)](https://utkuakinci.github.io/Game_Doner_Durum/)
+[![HEMEN_OYNA](https://img.shields.io/badge/DÖNER_DÜRÜM-🥙_DÖNER DÜRÜM-C62828?style=for-the-badge&logo=gamepad&logoColor=white&colorA=red&colorB=orange)](https://utkuakinci.github.io/Game_Doner_Durum/)
