@@ -13,11 +13,11 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:monospace;position:fixed;top:0;left:0;right:0;bottom:0;}
-#wrap{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;width:100%;height:100%;background:#000;position:fixed;top:0;left:0;}
-#ad-banner{width:100%;max-width:420px;min-height:72px;background:#111;border-top:2px solid #ff6b35;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;position:relative;}
+#wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;background:radial-gradient(ellipse at center,#1a1a1a 0%,#000 70%);position:fixed;top:0;left:0;}
+#ad-banner{width:100%;max-width:460px;min-height:72px;background:#111;border-top:2px solid #ff6b35;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;position:relative;}
 #ad-banner .ad-label{position:absolute;top:3px;left:6px;font-size:9px;color:#ffffff33;font-family:monospace;letter-spacing:1px;text-transform:uppercase;}
 #ad-banner .ad-slot{width:100%;max-width:320px;height:50px;background:#1a1a1a;border:1px dashed #ffffff22;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#ffffff33;font-size:11px;font-family:monospace;letter-spacing:1px;}
-#gc{position:relative;width:100%;max-width:420px;overflow:hidden;user-select:none;touch-action:none;}
+#gc{position:relative;width:100%;max-width:460px;overflow:hidden;user-select:none;touch-action:none;box-shadow:0 0 0 1px #ffffff14,0 20px 60px #000000cc;}
 #hud{position:absolute;top:0;left:0;width:100%;padding:6px 10px 4px;padding-top:max(6px,env(safe-area-inset-top));z-index:20;background:linear-gradient(180deg,#000000bb 85%,transparent);}
 #row-level{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
 #lvl-badge{background:#ffd700;color:#1a1000;font-size:11px;font-weight:800;border-radius:5px;padding:2px 8px;white-space:nowrap;}
@@ -31,6 +31,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:mon
 .bar-pct{font-size:10px;color:#ffffff99;}
 .bar-track{width:100%;height:13px;background:#ffffff22;border-radius:6px;overflow:hidden;border:1px solid #ffffff33;}
 .bar-fill{height:100%;border-radius:6px;transition:width .2s;}
+body.colorblind .bar-fill{background-image:repeating-linear-gradient(135deg,rgba(255,255,255,0.3) 0 4px,transparent 4px 9px)!important;background-blend-mode:overlay;}
+body.colorblind #chol-danger{border-style:dashed!important;}
+body.colorblind #cholbar-fill{outline:1px dashed #ffffff55;outline-offset:-2px;}
 #row-score{display:flex;justify-content:space-between;align-items:center;}
 #scorebox{font-size:13px;font-weight:800;color:#ffd700;}
 #livebox{display:flex;gap:3px;}
@@ -82,8 +85,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:mon
 .screen-btn.sec{background:#2980b9;}
 .screen-btn.ter{background:#27ae60;}
 .screen-btn.quat{background:#8e44ad;}
-#finalscore{font-size:17px;color:#ffd700;font-weight:800;margin:4px 0;text-align:center;}
-#endmsg{font-size:12px;color:#ffffffcc;text-align:center;margin-bottom:8px;}
+#finalscore{font-size:23px;color:#ffd700;font-weight:800;margin:4px 0;text-align:center;order:-1;}
+#endmsg{font-size:16px;color:#ffffffcc;text-align:center;margin-bottom:8px;order:-1;}
 #charsel h2,#leaderboard h2,#mapsel h2,#settings h2{font-size:20px;color:#ffd700;font-weight:800;margin-bottom:10px;text-align:center;}
 .settings-row{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:300px;background:#ffffff11;border-radius:10px;padding:10px 14px;margin-bottom:8px;}
 .settings-label{font-size:13px;color:#fff;font-weight:700;}
@@ -103,9 +106,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:mon
 .lb-name{font-size:13px;color:#fff;font-weight:800;}
 .lb-score{font-size:11px;color:#ffd700;}
 .lb-empty{font-size:13px;color:#ffffff55;text-align:center;padding:20px 0;}
-#theme-bar{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:10px;}
-.theme-btn{background:#ffffff22;border:1px solid #ffffff44;color:#fff;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:800;cursor:pointer;}
-.theme-btn.active{background:#ffd70044;border-color:#ffd700;}
 #overlay{background:linear-gradient(180deg,#00000099 0%,#000000cc 45%,#000000f2 100%);}
 .menu-title-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;}
 .menu-title-row h1{margin-bottom:0;}
@@ -136,6 +136,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:mon
 #overlay>*:nth-child(6){animation-delay:.27s}
 #overlay>*:nth-child(7){animation-delay:.32s}
 .menu-topbar{position:absolute;top:10px;right:10px;z-index:31;display:flex;gap:6px;}
+#version-tag{position:absolute;bottom:4px;right:8px;font-size:9px;color:#ffffff66;font-family:monospace;z-index:32;pointer-events:none;text-shadow:0 1px 2px #000;}
 .info-btn{background:#ffffff22;border:1px solid #ffd70066;color:#ffd700;width:30px;height:30px;border-radius:50%;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;-webkit-appearance:none;flex-shrink:0;}
 .info-btn:active{background:#ffd70033;}
 .info-btn.muted{color:#ffffff55;border-color:#ffffff33;}
@@ -145,7 +146,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:mon
 #info-card .xp-pills{margin-bottom:8px;}
 #info-card .info-row:last-child{margin-bottom:0;}
 .info-close{position:absolute;top:8px;right:8px;background:#e74c3c;border:none;color:#fff;width:26px;height:26px;border-radius:50%;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;-webkit-appearance:none;z-index:1;}
-.pause-btn{background:#ffffff22;border:1px solid #ffd70055;color:#ffd700;width:22px;height:22px;border-radius:50%;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;-webkit-appearance:none;padding:0;}
+.pause-btn{background:#ffffff22;border:1px solid #ffd70055;color:#ffd700;width:34px;height:34px;border-radius:50%;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;-webkit-appearance:none;padding:0;}
 .pause-btn:active{background:#ffd70033;}
 #pause-modal{position:absolute;inset:0;z-index:35;display:none;align-items:center;justify-content:center;background:#000000cc;padding:16px;}
 #pause-card{position:relative;background:#14161c;border:2px solid #ffd70055;border-radius:14px;padding:20px 18px;max-width:280px;width:100%;box-shadow:0 10px 30px #000000aa;animation:menuIn .25s ease-out;display:flex;flex-direction:column;align-items:center;}
@@ -191,6 +192,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:mon
   </div>
   <div id="badge-tray"></div>
   <div id="player"></div>
+  <div id="version-tag">v0.0.9</div>
 
 
   <div id="overlay" style="display:flex;">
@@ -199,11 +201,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:mon
       <button id="btn-music" class="info-btn btn-music-toggle" aria-label="Müzik">🎵</button>
       <button id="btn-info" class="info-btn" aria-label="Bilgi">ℹ️</button>
     </div>
-    <div class="menu-title-row">
+    <div class="menu-title-row" id="menu-title-row">
       <div class="menu-emoji">🌯</div>
       <h1>Dürüm Drop v0.0.9</h1>
     </div>
-    <div class="menu-cards-row">
+    <div class="menu-cards-row" id="menu-cards-row">
       <div class="picker-col">
         <div class="picker-label">Karakter Seçimi</div>
         <div class="picker-group">
@@ -227,13 +229,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:mon
         </div>
       </div>
     </div>
-    <div id="theme-bar">
-      <button class="theme-btn active" data-theme="turkey">🐈 Türkiye</button>
-      <button class="theme-btn" data-theme="greece">🏛️ Yunanistan</button>
-      <button class="theme-btn" data-theme="germany">🥨 Almanya</button>
-      <button class="theme-btn" data-theme="desert">🏜️ Çöl</button>
-    </div>
     <button class="screen-btn" id="btn-start">▶ OYNA / PLAY</button>
+    <button class="screen-btn sec" id="btn-backtomenu" style="display:none;">🏠 Karakter / Harita Seçimi</button>
     <button class="screen-btn ter" id="btn-lb">🏆 Skor Tablosu</button>
     <button class="screen-btn quat" id="btn-settings">⚙️ Ayarlar</button>
     <div id="finalscore" style="display:none;margin-top:8px;"></div>
@@ -249,6 +246,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:mon
     <div class="settings-row">
       <span class="settings-label">🎵 Müzik</span>
       <button class="info-btn btn-music-toggle" aria-label="Müzik">🎵</button>
+    </div>
+    <div class="settings-row">
+      <span class="settings-label">🎨 Renk Körü Modu</span>
+      <button class="info-btn btn-colorblind-toggle" id="btn-colorblind" aria-label="Renk körü modu">🎨</button>
     </div>
     <button class="screen-btn" id="btn-reset-data" style="background:#c0392b;">🧪 Test Verilerini Sıfırla</button>
     <div class="about-block">
@@ -321,7 +322,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:mon
 const AC=new(window.AudioContext||window.webkitAudioContext)();
 // iOS Safari requires user gesture to start AudioContext
 function resumeAC(){if(AC.state==='suspended')AC.resume();}
-let soundOn=true,musicOn=true;
+let soundOn=true,musicOn=true,colorblindMode=false;
 function playTone(freq,dur,type,vol,detune){
   try{const o=AC.createOscillator(),g=AC.createGain();o.type=type||'square';o.frequency.value=freq;o.detune.value=detune||0;g.gain.setValueAtTime(vol||.18,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+dur);o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+dur);}catch(e){}
 }
@@ -575,8 +576,9 @@ function getVW(){
 function resize(){
   const adBanner=document.getElementById('ad-banner');
   const adH=adBanner?adBanner.offsetHeight:72;
-  W=Math.min(getVW(),420);
+  W=Math.min(getVW(),460);
   H=Math.max(300, getVH()-adH);
+  H=Math.min(H,Math.round(W*2.3)); // cap aspect ratio so very tall/narrow screens don't stretch the play area
   gc.style.width=W+'px';gc.style.height=H+'px';
   document.getElementById('wrap').style.width=getVW()+'px';
   document.getElementById('wrap').style.height=getVH()+'px';
@@ -861,13 +863,12 @@ function cycleChar(dir){
 function cycleTheme(dir){
   const idx=THEME_ORDER.indexOf(currentTheme);
   currentTheme=THEME_ORDER[(idx+dir+THEME_ORDER.length)%THEME_ORDER.length];
-  document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.theme===currentTheme));
   renderMapPreview();saveSettings();
 }
 
-// ── SETTINGS PERSISTENCE (sound/music/char/theme) ─────────────────────────────
+// ── SETTINGS PERSISTENCE (sound/music/colorblind/char/theme) ──────────────────
 function saveSettings(){
-  try{localStorage.setItem('durum_settings',JSON.stringify({sound:soundOn,music:musicOn,char:selectedChar.id,theme:currentTheme}));}catch(e){}
+  try{localStorage.setItem('durum_settings',JSON.stringify({sound:soundOn,music:musicOn,colorblind:colorblindMode,char:selectedChar.id,theme:currentTheme}));}catch(e){}
 }
 function loadSettings(){
   let s=null;
@@ -875,11 +876,9 @@ function loadSettings(){
   if(!s)return;
   if(typeof s.sound==='boolean')soundOn=s.sound;
   if(typeof s.music==='boolean')musicOn=s.music;
+  if(typeof s.colorblind==='boolean')colorblindMode=s.colorblind;
   if(s.char){const c=CHARS.find(c=>c.id===s.char);if(c)selectedChar=c;}
-  if(s.theme&&THEME_ORDER.includes(s.theme)){
-    currentTheme=s.theme;
-    document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.theme===currentTheme));
-  }
+  if(s.theme&&THEME_ORDER.includes(s.theme))currentTheme=s.theme;
 }
 function renderMapPreview(){
   const cv=document.getElementById('menu-map-canvas'),ctx=cv.getContext('2d');
@@ -1056,6 +1055,7 @@ function initGame(){
   combo=0;comboTimer=0;bestCombo=0;goldenTimer=0;goldenInterval=1200;recordBeaten=false;
   totalDurum=0;totalComa=0;totalGolden=0;maxNodrink=0;
   comboBanner.style.display='none';recordBanner.style.opacity='0';recordBanner.style.animation='none';
+  statusEl.style.opacity=0;lvlBanner.style.opacity=0;cholDanger.style.opacity=0;cholDanger.style.borderWidth='0px';
   loadDailyQuests();renderQuests();
   setLives(3);updateBars();falling.forEach(f=>{try{gc.removeChild(f);}catch(e){}});falling=[];px=(W-PW)/2;drawPlayer();statusEl.style.opacity=0;lvlBanner.style.opacity=0;cholDanger.style.opacity=0;cholDanger.style.borderWidth='0px';document.getElementById('overlay').style.display='none';document.getElementById('finalscore').style.display='none';
   startGameplayMusic();
@@ -1069,11 +1069,16 @@ function endGame(){
   hudEl.style.display='none';
   playerEl.style.display='none';
   questPanel.style.display='none';
+  comboBanner.style.display='none';recordBanner.style.opacity='0';recordBanner.style.animation='none';
+  statusEl.style.opacity=0;lvlBanner.style.opacity=0;cholDanger.style.opacity=0;cholDanger.style.borderWidth='0px';
   stopGameplayMusic();if(musicOn)startMusic();
-  const ov=document.getElementById('overlay');ov.style.display='flex';document.getElementById('btn-start').textContent='▶ Tekrar / Retry';
+  const ov=document.getElementById('overlay');ov.style.display='flex';document.getElementById('btn-start').textContent='⟳ Tekrar / Retry';
+  document.getElementById('menu-cards-row').style.display='none';
+  document.getElementById('menu-title-row').style.display='none';
+  document.getElementById('btn-backtomenu').style.display='block';
   startMenuBG();
   const fs=document.getElementById('finalscore');fs.style.display='block';
-  fs.innerHTML='⭐ '+totalXp+' XP &nbsp;|&nbsp; LVL '+level+(bestCombo>=2?'<br><span style="font-size:13px;color:#f39c12">🔥 En İyi Combo: x'+bestCombo+'</span>':'')+(recordBeaten?'<br><span style="font-size:13px;color:#ffd700">🏆 Yeni Rekor!</span>':'');
+  fs.innerHTML='⭐ '+totalXp+' XP &nbsp;|&nbsp; LVL '+level+(bestCombo>=2?'<br><span style="font-size:18px;color:#f39c12">🔥 En İyi Combo: x'+bestCombo+'</span>':'')+(recordBeaten?'<br><span style="font-size:18px;color:#ffd700">🏆 Yeni Rekor!</span>':'');
   document.getElementById('endmsg').textContent=level>=8?'Efsane! 🏆':level>=5?'Harika! 🌯':level>=3?'Fena değil! 💪':'Tekrar dene! 😵';
 }
 
@@ -1101,10 +1106,24 @@ function quitToMenu(){
   falling.forEach(f=>{try{gc.removeChild(f);}catch(e){}});falling=[];
   badgeQueue=[];badgeShowing=false;badgeTray.innerHTML='';
   hudEl.style.display='none';playerEl.style.display='none';questPanel.style.display='none';
+  comboBanner.style.display='none';recordBanner.style.opacity='0';recordBanner.style.animation='none';
+  statusEl.style.opacity=0;lvlBanner.style.opacity=0;cholDanger.style.opacity=0;cholDanger.style.borderWidth='0px';
   stopGameplayMusic();if(musicOn)startMusic();
-  document.getElementById('btn-start').textContent='▶ OYNA / PLAY';
+  resetOverlayToFreshMenu();
   document.getElementById('overlay').style.display='flex';
   startMenuBG();
+}
+function showCharMapPicker(){
+  document.getElementById('menu-cards-row').style.display='flex';
+  document.getElementById('btn-backtomenu').style.display='none';
+}
+function resetOverlayToFreshMenu(){
+  document.getElementById('finalscore').style.display='none';
+  document.getElementById('endmsg').textContent='';
+  document.getElementById('menu-cards-row').style.display='flex';
+  document.getElementById('menu-title-row').style.display='flex';
+  document.getElementById('btn-backtomenu').style.display='none';
+  document.getElementById('btn-start').textContent='▶ OYNA / PLAY';
 }
 
 // Movement via drag only — MOVE_STEP not used
@@ -1169,7 +1188,6 @@ function renderMapGrid(){
       currentTheme=id;
       document.querySelectorAll('#map-grid .char-card').forEach(cc=>cc.classList.remove('selected'));
       card.classList.add('selected');
-      document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.theme===currentTheme));
       renderMapPreview();saveSettings();
     };
     card.addEventListener('click', selectTheme);
@@ -1209,7 +1227,7 @@ function drawTurkSprite(ctx, PW, PH, state, moving) {
 hudEl.style.display='none';
 playerEl.style.display='none';
 questPanel.style.display='none';
-loadSettings();updateAudioButtons();
+loadSettings();updateAudioButtons();updateColorblindButton();
 resize();drawPlayer();renderMenuChar();renderMapPreview();startMenuBG();
 
 
@@ -1275,6 +1293,7 @@ onBtn('btn-pause', pauseGame);
 onBtn('btn-resume', resumeGame);
 onBtn('btn-restart', restartFromPause);
 onBtn('btn-quit', quitToMenu);
+onBtn('btn-backtomenu', showCharMapPicker);
 onBtn('btn-info', ()=>{ document.getElementById('info-modal').style.display='flex'; });
 onBtn('btn-info-close', ()=>{ document.getElementById('info-modal').style.display='none'; });
 function updateAudioButtons(){
@@ -1292,6 +1311,11 @@ function toggleMusic(){
     pauseGameplayMusicTracks();
   }
 }
+function updateColorblindButton(){
+  document.querySelectorAll('.btn-colorblind-toggle').forEach(cb=>cb.classList.toggle('muted',!colorblindMode));
+  document.body.classList.toggle('colorblind',colorblindMode);
+}
+function toggleColorblind(){ colorblindMode=!colorblindMode; updateColorblindButton(); saveSettings(); }
 function wireAll(selector,fn){
   document.querySelectorAll(selector).forEach(el=>{
     el.addEventListener('click',fn);
@@ -1300,12 +1324,8 @@ function wireAll(selector,fn){
 }
 wireAll('.btn-sound-toggle',toggleSound);
 wireAll('.btn-music-toggle',toggleMusic);
+wireAll('.btn-colorblind-toggle',toggleColorblind);
 document.getElementById('info-modal').addEventListener('click', e=>{ if(e.target.id==='info-modal') e.currentTarget.style.display='none'; });
-document.querySelectorAll('.theme-btn').forEach(btn=>{
-  const applyTheme = () => { currentTheme=btn.dataset.theme; document.querySelectorAll('.theme-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderMapPreview(); saveSettings(); };
-  btn.addEventListener('click', applyTheme);
-  btn.addEventListener('touchend', e=>{ e.preventDefault(); e.stopPropagation(); applyTheme(); });
-});
 
 })();
 </script>
